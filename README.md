@@ -1,5 +1,5 @@
-# dm-react-webpack
-> Webpack config for isomorphic react apps. Client & Server. Babel, Stylus, css modules.
+# dm-bundler
+> Opinionated scripts and configs to develop a react-native-web project
 
 ## Usage
 
@@ -7,4 +7,4 @@ TBD
 
 ## MIT Licence
 
-Copyright (c) 2016 Pavel Zhukov
+Copyright (c) 2018 Pavel Zhukov
