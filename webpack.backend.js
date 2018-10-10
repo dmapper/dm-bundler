@@ -15,7 +15,7 @@ module.exports = _.pickBy({
   mode: PROD ? 'production' : 'development',
   devtool: 'source-map',
   entry: {
-    server: ['babel-polyfill', './server.js']
+    server: ['@babel/polyfill', './server.js']
   },
   output: {
     path: BUILD_PATH,
