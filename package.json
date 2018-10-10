@@ -2,7 +2,7 @@
   "name": "dm-bundler",
   "version": "0.0.5",
   "description": "",
-  "main": "webpack.config.js",
+  "main": "index.js",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
@@ -38,6 +38,7 @@
     "mini-css-extract-plugin": "^0.4.3",
     "moment-locales-webpack-plugin": "^1.0.7",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
+    "react-hot-loader": "^4.3.5",
     "style-loader": "^0.21.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
