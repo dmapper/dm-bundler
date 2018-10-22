@@ -8,6 +8,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const {LOCAL_IDENT_NAME} = require('./buildOptions')
+const {getJsxRule} = require ('./helpers')
 
 const VERBOSE = process.env.VERBOSE
 const DEV_PORT = 3010
@@ -15,16 +16,7 @@ const PROD = !process.env.WEBPACK_SERVE
 const STYLES_PATH = path.join(process.cwd(), '/styles/index.styl')
 const BUILD_DIR = '/build/client/'
 const BUILD_PATH = path.join(process.cwd(), BUILD_DIR)
-const COMPILE_REACT_NATIVE_MODULES = [
-  'react-native-web-linear-gradient',
-  'react-native-animatable',
-  'react-router-native-stack',
-  'react-native-datepicker',
-  'react-native-web-maps'
-]
-const forceCompileList = COMPILE_REACT_NATIVE_MODULES
-  .map(i => '/' + i)
-  .join('|')
+
 process.env.BABEL_ENV = PROD ? 'web_production' : 'web_development'
 
 module.exports = _.pickBy({
@@ -71,15 +63,9 @@ module.exports = _.pickBy({
   },
   module: {
     rules: [
-      {
-        test: /\.jsx?$/,
-        exclude: new RegExp(`node_modules(?!${forceCompileList})`),
-        loader: 'babel-loader',
-        options: {
-          babelrc: false,
-          configFile: './.babelrc.js'
-        }
-      },
+      Object.assign(getJsxRule(), {
+        exclude: /node_modules/,
+      }),
       {
         test: /\.(jpg|png|svg)$/,
         use: {
