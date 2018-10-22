@@ -150,11 +150,7 @@ module.exports = _.pickBy({
       // fix warning requiring './locale': https://github.com/moment/moment/issues/1435
       moment$: 'moment/moment.js',
       'react-native': 'react-native-web',
-      'react-router-native': 'react-router-dom',
-      'react-native-linear-gradient': 'react-native-web-linear-gradient',
-      'react-native-maps': 'react-native-web-maps',
-      'react-native-svg': 'react-native-svg-web',
-      'victory-native': 'victory'
+      'react-router-native': 'react-router-dom'
     },
     extensions: ['.web.js', '.js', '.web.jsx', '.jsx', '.json'],
     mainFields: ['jsnext:main', 'browser', 'main']
