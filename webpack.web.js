@@ -16,7 +16,7 @@ const PROD = !process.env.WEBPACK_SERVE
 const STYLES_PATH = path.join(process.cwd(), '/styles/index.styl')
 const BUILD_DIR = '/build/client/'
 const BUILD_PATH = path.join(process.cwd(), BUILD_DIR)
-const BUNDLE_NAME = 'app'
+const BUNDLE_NAME = 'main'
 
 process.env.BABEL_ENV = PROD ? 'web_production' : 'web_development'
 
