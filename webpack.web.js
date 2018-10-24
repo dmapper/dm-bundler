@@ -16,13 +16,14 @@ const PROD = !process.env.WEBPACK_SERVE
 const STYLES_PATH = path.join(process.cwd(), '/styles/index.styl')
 const BUILD_DIR = '/build/client/'
 const BUILD_PATH = path.join(process.cwd(), BUILD_DIR)
+const BUNDLE_NAME = 'app'
 
 process.env.BABEL_ENV = PROD ? 'web_production' : 'web_development'
 
 module.exports = _.pickBy({
   mode: PROD ? 'production' : 'development',
   entry: {
-    main: ['@babel/polyfill', './index.web.js']
+    [BUNDLE_NAME]: ['@babel/polyfill', './index.web.js']
   },
   optimization: PROD && {
     minimizer: [
@@ -36,7 +37,7 @@ module.exports = _.pickBy({
     splitChunks: {
       cacheGroups: {
         styles: {
-          name: 'main',
+          name: BUNDLE_NAME,
           test: /\.(css|styl)$/,
           chunks: 'all',
           enforce: true

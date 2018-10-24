@@ -11,7 +11,7 @@ const DIRECTORY_ALIASES = {
   appConstants: './appConstants'
 }
 
-const basePresets = ['react-native']
+const basePresets = ['module:metro-react-native-babel-preset']
 const basePlugins = [
   ['@babel/plugin-proposal-decorators', {legacy: true}],
   ['module-resolver', { alias: DIRECTORY_ALIASES }]
