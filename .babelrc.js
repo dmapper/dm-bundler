@@ -47,34 +47,36 @@ const nativeBasePlugins = () => [
   ]
 ]
 
+const webBasePlugins = () => [
+  'react-native-web-pass-classname'
+]
+
 module.exports = {
   presets: basePresets,
   plugins: basePlugins,
   env: {
     development: {
-      plugins: [].concat(
-        [dotenvPlugin()],
-        nativeBasePlugins()
-      )
+      plugins: [].concat([
+        dotenvPlugin()
+      ], nativeBasePlugins())
     },
     production: {
-      plugins: [].concat(
-        [dotenvPlugin({production: true})],
-        nativeBasePlugins()
-      )
+      plugins: [].concat([
+        dotenvPlugin({production: true})
+      ], nativeBasePlugins())
     },
     web_development: {
-      plugins: [
+      plugins: [].concat([
         'react-hot-loader/babel',
         dotenvPlugin(),
         webReactCssModulesPlugin()
-      ]
+      ], webBasePlugins())
     },
     web_production: {
-      plugins: [
+      plugins: [].concat([
         dotenvPlugin({production: true}),
         webReactCssModulesPlugin({production: true})
-      ]
+      ], webBasePlugins())
     },
     server: {
       plugins: [
