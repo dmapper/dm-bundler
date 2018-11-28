@@ -4,7 +4,7 @@ const path = require('path')
 const AssetsPlugin = require('assets-webpack-plugin')
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin')
 const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const {LOCAL_IDENT_NAME} = require('./buildOptions')
@@ -27,8 +27,8 @@ module.exports = _.pickBy({
   },
   optimization: PROD && {
     minimizer: [
-      new UglifyJsPlugin({
-        cache: true,
+      new TerserPlugin({
+        cache: false,
         parallel: true,
         sourceMap: false // set to true if you want JS source maps
       }),
