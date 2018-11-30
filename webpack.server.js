@@ -28,5 +28,8 @@ module.exports = _.pickBy({
         loader: 'babel-loader'
       }
     ]
+  },
+  resolve: {
+    extensions: ['.server.js', '.server.jsx', '.js', '.jsx', '.json']
   }
 }, Boolean)
