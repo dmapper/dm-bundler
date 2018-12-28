@@ -45,9 +45,9 @@ module.exports = _.pickBy({
           name (module) {
             // get the name. E.g. node_modules/packageName/not/this/part.js
             // or node_modules/packageName
-            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1]
+            const packageName = module.context.match(/[\\/]node_modules[\\/](@[^\\/]+[\\/][^\\/]+|[^@\\/]+)([\\/]|$)/)[1]
             // npm package names are URL-safe, but some servers don't like @ symbols
-            return `npm.${packageName.replace('@', '')}`
+            return `npm.${packageName.replace('@', '').replace(/[\\/]/, '_')}`
           }
         },
         components: {
@@ -67,7 +67,7 @@ module.exports = _.pickBy({
     new MomentLocalesPlugin(), // strip all locales except 'en'
     PROD && new MiniCssExtractPlugin({
       filename: '[name].css',
-      chunkFilename: '[name].[hash].css'
+      chunkFilename: '[name].[chunkhash].css'
     }),
     PROD && new AssetsPlugin({
       filename: 'assets.json',
@@ -78,7 +78,7 @@ module.exports = _.pickBy({
   output: {
     path: BUILD_PATH,
     publicPath: PROD ? BUILD_DIR : `http://localhost:${DEV_PORT}${BUILD_DIR}`,
-    filename: PROD ? '[name].[hash].js' : '[name].js'
+    filename: PROD ? '[name].[chunkhash].js' : '[name].js'
   },
   module: {
     rules: [
