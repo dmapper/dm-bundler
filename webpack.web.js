@@ -35,21 +35,39 @@ module.exports = _.pickBy({
       new OptimizeCSSAssetsPlugin({})
     ],
     splitChunks: {
+      maxInitialRequests: Infinity,
+      maxAsyncRequests: Infinity,
+      minSize: 0,
       cacheGroups: {
-        styles: {
-          name: BUNDLE_NAME,
-          test: /\.(css|styl)$/,
-          chunks: 'all',
-          enforce: true
+        vendor: {
+          chunks: 'async',
+          test: /[\\/]node_modules[\\/]/,
+          name (module) {
+            // get the name. E.g. node_modules/packageName/not/this/part.js
+            // or node_modules/packageName
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1]
+            // npm package names are URL-safe, but some servers don't like @ symbols
+            return `npm.${packageName.replace('@', '')}`
+          }
+        },
+        components: {
+          chunks: 'async',
+          minChunks: 1,
+          test: /[\\/]components[\\/][^\\/]+[\\/]/,
+          name (module) {
+            const componentName = module.context.match(/[\\/]components[\\/](.*?)([\\/]|$)/)[1]
+            return `component.${componentName}`
+          }
         }
-      }
+      },
     }
   },
   plugins: [
     !VERBOSE && !PROD && new FriendlyErrorsWebpackPlugin(),
     new MomentLocalesPlugin(), // strip all locales except 'en'
     PROD && new MiniCssExtractPlugin({
-      filename: '[name].css'
+      filename: '[name].css',
+      chunkFilename: '[name].[hash].css'
     }),
     PROD && new AssetsPlugin({
       filename: 'assets.json',
