@@ -1,5 +1,6 @@
 const genericNames = require('generic-names')
 const {LOCAL_IDENT_NAME} = require('./buildOptions')
+const ASYNC = process.env.ASYNC
 
 const DIRECTORY_ALIASES = {
   components: './components',
@@ -13,7 +14,7 @@ const DIRECTORY_ALIASES = {
 
 const clientPresets = [
   ['module:metro-react-native-babel-preset', {
-    disableImportExportTransform: true
+    disableImportExportTransform: !!ASYNC
   }]
 ]
 
