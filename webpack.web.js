@@ -18,6 +18,15 @@ const BUILD_DIR = '/build/client/'
 const BUILD_PATH = path.join(process.cwd(), BUILD_DIR)
 const BUNDLE_NAME = 'main'
 
+// Turn on support of asynchronously loaded chunks (dynamic import())
+// This will make a separate mini-bundle (chunk) for each npm module (from node_modules)
+// and each component from the /components/ folder
+const ASYNC = process.env.ASYNC
+if (ASYNC) console.log('[dm-bundler] ASYNC optimization is turned ON')
+
+const EXTENSIONS = ['.web.js', '.js', '.web.jsx', '.jsx', '.json']
+const ASYNC_EXTENSIONS = EXTENSIONS.map(i => '.async' + i)
+
 process.env.BABEL_ENV = PROD ? 'web_production' : 'web_development'
 
 module.exports = _.pickBy({
@@ -25,8 +34,8 @@ module.exports = _.pickBy({
   entry: {
     [BUNDLE_NAME]: ['@babel/polyfill', './index.web.js']
   },
-  optimization: PROD && {
-    minimizer: [
+  optimization: (PROD || ASYNC) && _.pickBy({
+    minimizer: PROD && [
       new TerserPlugin({
         cache: false,
         parallel: true,
@@ -34,7 +43,7 @@ module.exports = _.pickBy({
       }),
       new OptimizeCSSAssetsPlugin({})
     ],
-    splitChunks: {
+    splitChunks: ASYNC && {
       maxInitialRequests: Infinity,
       maxAsyncRequests: Infinity,
       minSize: 0,
@@ -61,7 +70,7 @@ module.exports = _.pickBy({
         }
       },
     }
-  },
+  }, Boolean),
   plugins: [
     !VERBOSE && !PROD && new FriendlyErrorsWebpackPlugin(),
     new MomentLocalesPlugin(), // strip all locales except 'en'
@@ -157,7 +166,7 @@ module.exports = _.pickBy({
       'react-native': 'react-native-web',
       'react-router-native': 'react-router-dom'
     },
-    extensions: ['.web.js', '.js', '.web.jsx', '.jsx', '.json'],
+    extensions: ASYNC ? ASYNC_EXTENSIONS.concat(EXTENSIONS) : EXTENSIONS,
     mainFields: ['jsnext:main', 'browser', 'main']
   }
 }, Boolean)
