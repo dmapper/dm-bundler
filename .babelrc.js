@@ -1,5 +1,6 @@
 const genericNames = require('generic-names')
 const {LOCAL_IDENT_NAME} = require('./buildOptions')
+const ASYNC = process.env.ASYNC
 
 const DIRECTORY_ALIASES = {
   components: './components',
@@ -11,7 +12,14 @@ const DIRECTORY_ALIASES = {
   appConstants: './appConstants'
 }
 
-const basePresets = ['module:metro-react-native-babel-preset']
+const clientPresets = [
+  ['module:metro-react-native-babel-preset', {
+    disableImportExportTransform: !!ASYNC
+  }]
+]
+
+const serverPresets = ['module:metro-react-native-babel-preset']
+
 const basePlugins = [
   ['@babel/plugin-proposal-decorators', {legacy: true}],
   ['module-resolver', { alias: DIRECTORY_ALIASES }]
@@ -52,20 +60,22 @@ const webBasePlugins = () => [
 ]
 
 module.exports = {
-  presets: basePresets,
   plugins: basePlugins,
   env: {
     development: {
+      presets: clientPresets,
       plugins: [].concat([
         dotenvPlugin()
       ], nativeBasePlugins())
     },
     production: {
+      presets: clientPresets,
       plugins: [].concat([
         dotenvPlugin({production: true})
       ], nativeBasePlugins())
     },
     web_development: {
+      presets: clientPresets,
       plugins: [].concat([
         'react-hot-loader/babel',
         dotenvPlugin(),
@@ -73,12 +83,14 @@ module.exports = {
       ], webBasePlugins())
     },
     web_production: {
+      presets: clientPresets,
       plugins: [].concat([
         dotenvPlugin({production: true}),
         webReactCssModulesPlugin({production: true})
       ], webBasePlugins())
     },
     server: {
+      presets: serverPresets,
       plugins: [
         ['@babel/plugin-transform-runtime', {
           regenerator: true
