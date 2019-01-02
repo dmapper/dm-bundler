@@ -5,6 +5,23 @@
 
 TBD
 
+## Async chunks support
+
+Pass `ASYNC=1` env var when building to enable the asynchronous chunks
+support. This will make each node module from `/node_modules/`
+and each component from the `/components/` folder to be its own small chunk
+loaded asynchronously.
+
+This is useful when you are using dynamic `import()` in your code.
+
+When the `ASYNC=1` is passed, the files with the extension `.async.js`
+will take priority over the plain `.js` files. This enables you
+to move the asynchronous dynamic `import()` statements into their own files.
+
+Duplicating your dependencies in `.js` and `.async.js` files enables
+you to have your codebase running in environments which don't
+support the dynamic `import()` yet, for example the react-native Metro builder.
+
 ## MIT Licence
 
 Copyright (c) 2018 Pavel Zhukov
