@@ -25,6 +25,7 @@ support the dynamic `import()` yet, for example the react-native Metro builder.
 Your production server must have HTTP/2 support, otherwise you'll have a connection
 limit of around 6 connections per hostname and you will notice your website
 loading VERY SLOOOOW in production (if you set the Network Throttling to `Slow 3G`).
+
 If you use Google Load Balancer and serve your content through HTTPS, then you
 already have the HTTP/2 enabled without having to handle HTTP/2 in your Node.js app:
 
