@@ -11,7 +11,7 @@ const {LOCAL_IDENT_NAME} = require('./buildOptions')
 const {getJsxRule} = require ('./helpers')
 
 const VERBOSE = process.env.VERBOSE
-const DEV_PORT = 3010
+const DEV_PORT = ~~process.env.DEV_PORT || 3010
 const PROD = !process.env.WEBPACK_SERVE
 const STYLES_PATH = path.join(process.cwd(), '/styles/index.styl')
 const BUILD_DIR = '/build/client/'
