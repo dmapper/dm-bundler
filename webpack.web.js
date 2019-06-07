@@ -1,5 +1,4 @@
 const _ = require('lodash')
-const webpack = require('webpack')
 const path = require('path')
 const AssetsPlugin = require('assets-webpack-plugin')
 const MomentLocalesPlugin = require('moment-locales-webpack-plugin')
@@ -7,8 +6,8 @@ const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
-const {LOCAL_IDENT_NAME} = require('./buildOptions')
-const {getJsxRule} = require ('./helpers')
+const { LOCAL_IDENT_NAME } = require('./buildOptions')
+const { getJsxRule } = require('./helpers')
 
 const VERBOSE = process.env.VERBOSE
 const DEV_PORT = ~~process.env.DEV_PORT || 3010
@@ -68,7 +67,7 @@ module.exports = _.pickBy({
             return `component.${componentName}`
           }
         }
-      },
+      }
     }
   }, Boolean),
   plugins: [
@@ -92,7 +91,7 @@ module.exports = _.pickBy({
   module: {
     rules: [
       Object.assign(getJsxRule(), {
-        exclude: /node_modules/,
+        exclude: /node_modules/
       }),
       {
         test: /\.(jpg|png|svg)$/,
@@ -115,6 +114,12 @@ module.exports = _.pickBy({
             options: {
               modules: true,
               localIdentName: LOCAL_IDENT_NAME
+            }
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              plugins: [require('autoprefixer')()]
             }
           },
           {
