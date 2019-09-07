@@ -21,6 +21,12 @@ const clientPresets = [
 const serverPresets = ['module:metro-react-native-babel-preset']
 
 const basePlugins = [
+  ['transform-react-pug', {
+    classAttribute: 'styleName'
+  }],
+  ['react-pug-classnames', {
+    classAttribute: 'styleName'
+  }],
   ['@babel/plugin-proposal-decorators', {legacy: true}],
   ['module-resolver', { alias: DIRECTORY_ALIASES }]
 ]
