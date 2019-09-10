@@ -35,7 +35,7 @@ const DEFAULT_ALIAS = {
 
 process.env.BABEL_ENV = PROD ? 'web_production' : 'web_development'
 
-module.exports = function getConfig ({
+module.exports = function getConfig (env, {
   forceCompileModules = [],
   alias = {}
 } = {}) {

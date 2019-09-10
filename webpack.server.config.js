@@ -9,7 +9,7 @@ const BUILD_PATH = path.join(process.cwd(), BUILD_DIR)
 
 process.env.BABEL_ENV = 'server'
 
-module.exports = function getConfig ({
+module.exports = function getConfig (env, {
   forceCompileModules = [],
   alias = {}
 } = {}) {
