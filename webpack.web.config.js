@@ -39,6 +39,12 @@ module.exports = function getConfig (env, {
   forceCompileModules = [],
   alias = {}
 } = {}) {
+  if (typeof forceCompileModules === 'string') {
+    forceCompileModules = JSON.parse(forceCompileModules)
+  }
+  if (typeof alias === 'string') {
+    alias = JSON.parse(alias)
+  }
   // array must be non-empty to prevent matching all node_modules via regex
   forceCompileModules = forceCompileModules.concat(['DUMMY_MODULE'])
   return _.pickBy({

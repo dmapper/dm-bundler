@@ -13,6 +13,12 @@ module.exports = function getConfig (env, {
   forceCompileModules = [],
   alias = {}
 } = {}) {
+  if (typeof forceCompileModules === 'string') {
+    forceCompileModules = JSON.parse(forceCompileModules)
+  }
+  if (typeof alias === 'string') {
+    alias = JSON.parse(alias)
+  }
   return _.pickBy({
     target: 'node', // in order to ignore built-in modules like path, fs, etc.
     externals: [nodeExternals({ whitelist: forceCompileModules })], // in order to ignore all modules in node_modules folder
