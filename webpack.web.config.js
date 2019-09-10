@@ -26,152 +26,167 @@ if (ASYNC) console.log('[dm-bundler] ASYNC optimization is turned ON')
 const EXTENSIONS = ['.web.js', '.js', '.web.jsx', '.jsx', '.json']
 const ASYNC_EXTENSIONS = EXTENSIONS.map(i => '.async' + i)
 
+const DEFAULT_ALIAS = {
+  // fix warning requiring './locale': https://github.com/moment/moment/issues/1435
+  moment$: 'moment/moment.js',
+  'react-native': 'react-native-web',
+  'react-router-native': 'react-router-dom'
+}
+
 process.env.BABEL_ENV = PROD ? 'web_production' : 'web_development'
 
-module.exports = _.pickBy({
-  mode: PROD ? 'production' : 'development',
-  entry: {
-    [BUNDLE_NAME]: ['@babel/polyfill', './index.web.js']
-  },
-  optimization: (PROD || ASYNC) && _.pickBy({
-    minimizer: PROD && [
-      new TerserPlugin({
-        cache: false,
-        parallel: true,
-        sourceMap: false // set to true if you want JS source maps
+module.exports = function getConfig ({
+  forceCompileModules = [],
+  alias = {}
+} = {}) {
+  // array must be non-empty to prevent matching all node_modules via regex
+  forceCompileModules = forceCompileModules.concat(['DUMMY_MODULE'])
+  return _.pickBy({
+    mode: PROD ? 'production' : 'development',
+    entry: {
+      [BUNDLE_NAME]: ['@babel/polyfill', './index.web.js']
+    },
+    optimization: (PROD || ASYNC) && _.pickBy({
+      minimizer: PROD && [
+        new TerserPlugin({
+          cache: false,
+          parallel: true,
+          sourceMap: false // set to true if you want JS source maps
+        }),
+        new OptimizeCSSAssetsPlugin({})
+      ],
+      splitChunks: ASYNC && {
+        maxInitialRequests: Infinity,
+        maxAsyncRequests: Infinity,
+        minSize: 0,
+        cacheGroups: {
+          vendor: {
+            chunks: 'async',
+            test: /[\\/]node_modules[\\/]/,
+            name (module) {
+              // get the name. E.g. node_modules/packageName/not/this/part.js
+              // or node_modules/packageName
+              const packageName = module.context.match(/[\\/]node_modules[\\/](@[^\\/]+[\\/][^\\/]+|[^@\\/]+)([\\/]|$)/)[1]
+              // npm package names are URL-safe, but some servers don't like @ symbols
+              return `npm.${packageName.replace('@', '').replace(/[\\/]/, '_')}`
+            }
+          },
+          components: {
+            chunks: 'async',
+            minChunks: 1,
+            test: /[\\/]components[\\/][^\\/]+[\\/]/,
+            name (module) {
+              const componentName = module.context.match(/[\\/]components[\\/](.*?)([\\/]|$)/)[1]
+              return `component.${componentName}`
+            }
+          }
+        }
+      }
+    }, Boolean),
+    plugins: [
+      !VERBOSE && !PROD && new FriendlyErrorsWebpackPlugin(),
+      new MomentLocalesPlugin(), // strip all locales except 'en'
+      PROD && new MiniCssExtractPlugin({
+        filename: '[name].css',
+        chunkFilename: '[name].[chunkhash].css'
       }),
-      new OptimizeCSSAssetsPlugin({})
-    ],
-    splitChunks: ASYNC && {
-      maxInitialRequests: Infinity,
-      maxAsyncRequests: Infinity,
-      minSize: 0,
-      cacheGroups: {
-        vendor: {
-          chunks: 'async',
-          test: /[\\/]node_modules[\\/]/,
-          name (module) {
-            // get the name. E.g. node_modules/packageName/not/this/part.js
-            // or node_modules/packageName
-            const packageName = module.context.match(/[\\/]node_modules[\\/](@[^\\/]+[\\/][^\\/]+|[^@\\/]+)([\\/]|$)/)[1]
-            // npm package names are URL-safe, but some servers don't like @ symbols
-            return `npm.${packageName.replace('@', '').replace(/[\\/]/, '_')}`
+      PROD && new AssetsPlugin({
+        filename: 'assets.json',
+        fullPath: false,
+        path: BUILD_PATH
+      })
+    ].filter(Boolean),
+    output: {
+      path: BUILD_PATH,
+      publicPath: PROD ? BUILD_DIR : `http://localhost:${DEV_PORT}${BUILD_DIR}`,
+      filename: PROD ? '[name].[chunkhash].js' : '[name].js'
+    },
+    module: {
+      rules: [
+        Object.assign(getJsxRule(), {
+          exclude: /node_modules/
+        }),
+        Object.assign(getJsxRule(), {
+          include: new RegExp(`node_modules/(?:${forceCompileModules.join('|')})`)
+        }),
+        {
+          test: /\.(jpg|png|svg)$/,
+          use: {
+            loader: 'file-loader',
+            options: {
+              name: '[path][name].[hash].[ext]',
+              publicPath: '/build/client/'
+            }
           }
         },
-        components: {
-          chunks: 'async',
-          minChunks: 1,
-          test: /[\\/]components[\\/][^\\/]+[\\/]/,
-          name (module) {
-            const componentName = module.context.match(/[\\/]components[\\/](.*?)([\\/]|$)/)[1]
-            return `component.${componentName}`
-          }
-        }
-      }
-    }
-  }, Boolean),
-  plugins: [
-    !VERBOSE && !PROD && new FriendlyErrorsWebpackPlugin(),
-    new MomentLocalesPlugin(), // strip all locales except 'en'
-    PROD && new MiniCssExtractPlugin({
-      filename: '[name].css',
-      chunkFilename: '[name].[chunkhash].css'
-    }),
-    PROD && new AssetsPlugin({
-      filename: 'assets.json',
-      fullPath: false,
-      path: BUILD_PATH
-    })
-  ].filter(Boolean),
-  output: {
-    path: BUILD_PATH,
-    publicPath: PROD ? BUILD_DIR : `http://localhost:${DEV_PORT}${BUILD_DIR}`,
-    filename: PROD ? '[name].[chunkhash].js' : '[name].js'
-  },
-  module: {
-    rules: [
-      Object.assign(getJsxRule(), {
-        exclude: /node_modules/
-      }),
-      {
-        test: /\.(jpg|png|svg)$/,
-        use: {
-          loader: 'file-loader',
-          options: {
-            name: '[path][name].[hash].[ext]',
-            publicPath: '/build/client/'
-          }
-        }
-      },
-      {
-        test: /\.styl$/,
-        use: [
-          {
-            loader: PROD ? MiniCssExtractPlugin.loader : 'style-loader'
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              modules: true,
-              localIdentName: LOCAL_IDENT_NAME
-            }
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              plugins: [require('autoprefixer')()]
-            }
-          },
-          {
-            loader: 'stylus-loader',
-            options: {
-              import: [STYLES_PATH],
-              define: {
-                __WEB__: true
+        {
+          test: /\.styl$/,
+          use: [
+            {
+              loader: PROD ? MiniCssExtractPlugin.loader : 'style-loader'
+            },
+            {
+              loader: 'css-loader',
+              options: {
+                modules: true,
+                localIdentName: LOCAL_IDENT_NAME
+              }
+            },
+            {
+              loader: 'postcss-loader',
+              options: {
+                plugins: [require('autoprefixer')()]
+              }
+            },
+            {
+              loader: 'stylus-loader',
+              options: {
+                import: [STYLES_PATH],
+                define: {
+                  __WEB__: true
+                }
               }
             }
-          }
-        ]
-      },
-      {
-        test: /\.css$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: PROD ? MiniCssExtractPlugin.loader : 'style-loader'
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              modules: true,
-              localIdentName: LOCAL_IDENT_NAME
+          ]
+        },
+        {
+          test: /\.css$/,
+          exclude: /node_modules/,
+          use: [
+            {
+              loader: PROD ? MiniCssExtractPlugin.loader : 'style-loader'
+            },
+            {
+              loader: 'css-loader',
+              options: {
+                modules: true,
+                localIdentName: LOCAL_IDENT_NAME
+              }
             }
-          }
-        ]
-      },
-      // Vendor stylesheets
-      {
-        test: /\.css$/,
-        include: /node_modules/,
-        use: [
-          {
-            loader: PROD ? MiniCssExtractPlugin.loader : 'style-loader'
-          },
-          {
-            loader: 'css-loader'
-          }
-        ]
-      }
-    ]
-  },
-  resolve: {
-    alias: {
-      // fix warning requiring './locale': https://github.com/moment/moment/issues/1435
-      moment$: 'moment/moment.js',
-      'react-native': 'react-native-web',
-      'react-router-native': 'react-router-dom'
+          ]
+        },
+        // Vendor stylesheets
+        {
+          test: /\.css$/,
+          include: /node_modules/,
+          use: [
+            {
+              loader: PROD ? MiniCssExtractPlugin.loader : 'style-loader'
+            },
+            {
+              loader: 'css-loader'
+            }
+          ]
+        }
+      ]
     },
-    extensions: ASYNC ? ASYNC_EXTENSIONS.concat(EXTENSIONS) : EXTENSIONS,
-    mainFields: ['jsnext:main', 'browser', 'main']
-  }
-}, Boolean)
+    resolve: {
+      alias: {
+        ...DEFAULT_ALIAS,
+        alias
+      },
+      extensions: ASYNC ? ASYNC_EXTENSIONS.concat(EXTENSIONS) : EXTENSIONS,
+      mainFields: ['jsnext:main', 'browser', 'main']
+    }
+  }, Boolean)
+}
