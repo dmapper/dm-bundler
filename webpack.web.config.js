@@ -26,6 +26,9 @@ if (ASYNC) console.log('[dm-bundler] ASYNC optimization is turned ON')
 const EXTENSIONS = ['.web.js', '.js', '.web.jsx', '.jsx', '.json']
 const ASYNC_EXTENSIONS = EXTENSIONS.map(i => '.async' + i)
 
+const DEFAULT_FORCE_COMPILE_MODULES = [
+  'react-sharedb/init'
+]
 const DEFAULT_ALIAS = {
   // fix warning requiring './locale': https://github.com/moment/moment/issues/1435
   moment$: 'moment/moment.js',
@@ -46,7 +49,7 @@ module.exports = function getConfig (env, {
     alias = JSON.parse(alias)
   }
   // array must be non-empty to prevent matching all node_modules via regex
-  forceCompileModules = forceCompileModules.concat(['DUMMY_MODULE'])
+  forceCompileModules = forceCompileModules.concat(DEFAULT_FORCE_COMPILE_MODULES)
   return _.pickBy({
     mode: PROD ? 'production' : 'development',
     entry: {

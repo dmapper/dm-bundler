@@ -9,6 +9,10 @@ const BUILD_PATH = path.join(process.cwd(), BUILD_DIR)
 
 process.env.BABEL_ENV = 'server'
 
+const DEFAULT_FORCE_COMPILE_MODULES = [
+  'react-sharedb/init'
+]
+
 module.exports = function getConfig (env, {
   forceCompileModules = [],
   alias = {}
@@ -19,6 +23,7 @@ module.exports = function getConfig (env, {
   if (typeof alias === 'string') {
     alias = JSON.parse(alias)
   }
+  forceCompileModules = forceCompileModules.concat(DEFAULT_FORCE_COMPILE_MODULES)
   return _.pickBy({
     target: 'node', // in order to ignore built-in modules like path, fs, etc.
     externals: [nodeExternals({ whitelist: forceCompileModules })], // in order to ignore all modules in node_modules folder
