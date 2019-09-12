@@ -49,14 +49,10 @@
     "stylus-loader": "^3.0.2",
     "terser-webpack-plugin": "^1.1.0",
     "webpack": "^4.20.2",
-    "webpack-command": "^0.4.1",
-    "webpack-node-externals": "^1.7.2",
-    "webpack-serve": "http://github.com/dmapper/webpack-serve/tarball/master"
+    "webpack-node-externals": "^1.7.2"
   },
   "peerDependencies": {
     "@babel/runtime": "^7.0.0",
-    "webpack": "*",
-    "webpack-command": "*",
-    "webpack-serve": "*"
+    "webpack": "*"
   }
 }
