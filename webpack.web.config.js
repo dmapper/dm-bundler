@@ -42,6 +42,14 @@ if (!PROD) {
   DEFAULT_ALIAS['react-dom'] = '@hot-loader/react-dom'
 }
 
+let DEFAULT_ENTRIES = [
+  '@babel/polyfill'
+]
+// Enable hot reloading in development:
+if (!PROD) {
+  DEFAULT_ENTRIES.push('react-hot-loader/patch')
+}
+
 process.env.BABEL_ENV = PROD ? 'web_production' : 'web_development'
 
 module.exports = function getConfig (env, {
@@ -59,7 +67,7 @@ module.exports = function getConfig (env, {
   return _.pickBy({
     mode: PROD ? 'production' : 'development',
     entry: {
-      [BUNDLE_NAME]: ['@babel/polyfill', 'react-hot-loader/patch', './index.web.js']
+      [BUNDLE_NAME]: DEFAULT_ENTRIES.concat(['./index.web.js'])
     },
     optimization: (PROD || ASYNC) && _.pickBy({
       minimizer: PROD && [
@@ -202,6 +210,15 @@ module.exports = function getConfig (env, {
       },
       extensions: ASYNC ? ASYNC_EXTENSIONS.concat(EXTENSIONS) : EXTENSIONS,
       mainFields: ['jsnext:main', 'browser', 'main']
+    },
+    devServer: {
+      host: '0.0.0.0',
+      port: 3010,
+      hot: true,
+      headers: {
+        'Access-Control-Allow-Origin': '*'
+      },
+      publicPath: '/build/client/'
     }
   }, Boolean)
 }
