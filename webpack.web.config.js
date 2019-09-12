@@ -192,7 +192,7 @@ module.exports = function getConfig (env, {
     resolve: {
       alias: {
         ...DEFAULT_ALIAS,
-        alias
+        ...alias
       },
       extensions: ASYNC ? ASYNC_EXTENSIONS.concat(EXTENSIONS) : EXTENSIONS,
       mainFields: ['jsnext:main', 'browser', 'main']

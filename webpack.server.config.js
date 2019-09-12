@@ -12,6 +12,8 @@ process.env.BABEL_ENV = 'server'
 const DEFAULT_FORCE_COMPILE_MODULES = [
   'react-sharedb/init'
 ]
+const DEFAULT_ALIAS = {
+}
 
 module.exports = function getConfig (env, {
   forceCompileModules = [],
@@ -46,7 +48,10 @@ module.exports = function getConfig (env, {
     },
     resolve: {
       extensions: ['.server.js', '.server.jsx', '.js', '.jsx', '.json'],
-      alias
+      alias: {
+        ...DEFAULT_ALIAS,
+        ...alias
+      },
     }
   }, Boolean)
 }
