@@ -36,6 +36,12 @@ const DEFAULT_ALIAS = {
   'react-router-native': 'react-router-dom'
 }
 
+// Enable hooks hot reloading in development:
+// https://github.com/gaearon/react-hot-loader#hot-loaderreact-dom
+if (!PROD) {
+  DEFAULT_ALIAS['react-dom'] = '@hot-loader/react-dom'
+}
+
 process.env.BABEL_ENV = PROD ? 'web_production' : 'web_development'
 
 module.exports = function getConfig (env, {
@@ -53,7 +59,7 @@ module.exports = function getConfig (env, {
   return _.pickBy({
     mode: PROD ? 'production' : 'development',
     entry: {
-      [BUNDLE_NAME]: ['@babel/polyfill', './index.web.js']
+      [BUNDLE_NAME]: ['@babel/polyfill', 'react-hot-loader/patch', './index.web.js']
     },
     optimization: (PROD || ASYNC) && _.pickBy({
       minimizer: PROD && [
